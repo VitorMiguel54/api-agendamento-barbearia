@@ -1,0 +1,72 @@
+CREATE TABLE tb_cliente (
+	id INT IDENTITY PRIMARY KEY,
+	nome VARCHAR(50) NOT NULL,
+	telefone VARCHAR(20),
+	email VARCHAR(100) NOT NULL,
+	data_criacao DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+	data_atualizacao DATETIME NULL,
+	ativo BIT DEFAULT 1
+);
+GO
+
+CREATE TABLE tb_loja (
+	id INT IDENTITY PRIMARY KEY,
+	nome VARCHAR(100) NOT NULL,
+	data_criacao DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+	data_atualizacao DATETIME NULL,
+	ativo BIT DEFAULT 1
+);
+GO
+
+CREATE TABLE tb_profissional (
+	id INT IDENTITY PRIMARY KEY,
+	loja_id INT NOT NULL,
+	nome VARCHAR(50) NOT NULL,
+	data_criacao DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+	data_atualizacao DATETIME NULL,
+	ativo BIT DEFAULT 1,
+
+	CONSTRAINT fk_profissional_loja FOREIGN KEY (loja_id) REFERENCES tb_loja(id)
+);
+GO
+
+CREATE TABLE tb_servico (
+	id INT IDENTITY PRIMARY KEY,
+	nome VARCHAR(50) NOT NULL,
+	descricao VARCHAR(100),
+	tempo_minutos INT NOT NULL,
+	preco DECIMAL(10,2) NOT NULL,
+	data_criacao DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+	data_atualizacao DATETIME NULL,
+	ativo BIT DEFAULT 1
+);
+GO
+
+CREATE TABLE tb_servico_loja (
+	id INT IDENTITY PRIMARY KEY,
+	loja_id INT NOT NULL,
+	servico_id INT NOT NULL,
+	preco DECIMAL(10,2) NOT NULL,
+	tempo_minutos INT NOT NULL,
+	ativo BIT DEFAULT 1,
+
+	CONSTRAINT fk_sl_loja FOREIGN KEY (loja_id) REFERENCES tb_loja(id),
+	CONSTRAINT fk_sl_servico FOREIGN KEY (servico_id) REFERENCES tb_servico(id)
+);
+GO
+
+CREATE TABLE tb_agendamento (
+	id INT IDENTITY PRIMARY KEY,
+	cliente_id INT NOT NULL,
+	servico_loja_id INT NOT NULL,
+	profissional_id INT NOT NULL,
+	data_agendamento DATETIME2 NOT NULL,
+	status VARCHAR(20) CHECK (status IN ('PENDENTE', 'CONFIRMADO', 'CANCELADO', 'FINALIZADO')) DEFAULT 'PENDENTE' NOT NULL,
+	data_criacao DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+	data_atualizacao DATETIME NULL,
+
+	CONSTRAINT fk_cliente FOREIGN KEY (cliente_id) REFERENCES tb_cliente(id),
+    CONSTRAINT fk_servico_loja FOREIGN KEY (servico_loja_id) REFERENCES tb_servico_loja(id),
+	CONSTRAINT fk_profissional FOREIGN KEY (profissional_id) REFERENCES tb_profissional(id)
+);
+GO
