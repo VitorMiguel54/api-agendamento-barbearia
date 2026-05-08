@@ -160,10 +160,10 @@ namespace SolucaoBarbearia.infra.Repositorios
 
 
                 string sql = @"UPDATE tb_agendamento
-                           SET
-                                status = 'CANCELADO',
-                                data_atualizacao = SYSDATETIME()
-                           WHERE id = @id";
+                             SET
+                             status = 'CANCELADO',
+                             data_atualizacao = SYSDATETIME()
+                             WHERE id = @id";
 
                 using (SqlCommand comando = new SqlCommand(sql, conexao))
                 {
