@@ -14,19 +14,12 @@ public class ServicoController : ControllerBase
         _service = service;
     }
 
-    [HttpGet("")]
+    [HttpGet]
     public IActionResult Get()
     {
-        return Ok(_service.Listar()
-            .Select(s => new
-            {
-                Id = s.Id,
-                LojaId = s.LojaId,
-                Nome = s.Nome,
-                Descricao = s.Descricao,
-                TempoMinutos = $"{s.TempoMinutos} min",
-                Preco = $"R$ {s.Preco:N2}"
-            }));
+        var servicos = _service.ListarServicosLoja();
+
+        return Ok(servicos);
     }
 
     [HttpGet("{id}")]

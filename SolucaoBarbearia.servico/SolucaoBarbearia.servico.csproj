@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SolucaoBarbearia.infra\SolucaoBarbearia.infra.csproj" />
+    <ProjectReference Include="..\SolucoaBarbearia.dominio\SolucaoBarbearia.dominio.csproj" />
   </ItemGroup>
 
 </Project>

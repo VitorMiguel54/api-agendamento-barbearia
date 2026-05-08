@@ -26,6 +26,7 @@ namespace SolucaoBarbearia.infra.Repositorios
 
                 string sql = @"INSERT INTO tb_servico
                 (loja_id, nome, descricao, tempo_minutos, preco)
+                OUTPUT INSERTED.id
                 VALUES 
                 (@loja_id, @nome, @descricao, @tempo_minutos, @preco)";
 
@@ -37,7 +38,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@tempo_minutos", servico.TempoMinutos);
                     comando.Parameters.AddWithValue("@preco", servico.Preco);
 
-                    comando.ExecuteNonQuery();
+                    servico.Id = Convert.ToInt32(comando.ExecuteScalar());
                 }
             }
         }
@@ -74,6 +75,51 @@ namespace SolucaoBarbearia.infra.Repositorios
             }
 
             return listarServicos;
+        }
+
+        public List<dynamic> ListarServicosLoja()
+        {
+            List<dynamic> lista = new List<dynamic>();
+
+            using (SqlConnection conexao = new SqlConnection(_connectionString))
+            {
+                conexao.Open();
+
+                string sql = @"
+        SELECT
+            sl.id AS ServicoLojaId,
+            sl.loja_id AS LojaId,
+            s.id AS ServicoId,
+            s.nome,
+            s.descricao,
+            sl.preco,
+            sl.tempo_minutos
+        FROM tb_servico_loja sl
+        INNER JOIN tb_servico s
+            ON s.id = sl.servico_id";
+
+                using (SqlCommand comando = new SqlCommand(sql, conexao))
+                {
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new
+                            {
+                                ServicoLojaId = Convert.ToInt32(reader["ServicoLojaId"]),
+                                LojaID = Convert.ToInt32(reader["LojaId"]),
+                                ServicoId = Convert.ToInt32(reader["ServicoId"]),
+                                Nome = reader["nome"].ToString(),
+                                Descricao = reader["descricao"].ToString(),
+                                Preco = Convert.ToDecimal(reader["preco"]),
+                                TempoMinutos = Convert.ToInt32(reader["tempo_minutos"])
+                            });
+                        }
+                    }
+                }
+            }
+
+            return lista;
         }
 
         public Servico BuscarPorId(int id)

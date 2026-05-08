@@ -19,6 +19,8 @@ builder.Services.AddScoped<ServicoRepositorio>();
 builder.Services.AddScoped<LojaRepositorio>();
 builder.Services.AddScoped<LojaService>();
 
+builder.Services.AddScoped<ServicoLojaRepositorio>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
