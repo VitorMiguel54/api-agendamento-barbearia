@@ -1,15 +1,11 @@
 ﻿using Dominio.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SolucaoBarbearia.dominio.Interfaces;
 
 namespace SolucaoBarbearia.infra.Repositorios
 {
-    public class ServicoRepositorio
+    public class ServicoRepositorio : IServicoRepository
     {
         private readonly string _connectionString;
 
@@ -18,7 +14,7 @@ namespace SolucaoBarbearia.infra.Repositorios
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void Cadastrar(Servico servico)
+        public bool Cadastrar(Servico servico)
         {
             using (SqlConnection conexao = new SqlConnection(_connectionString))
             {
@@ -38,7 +34,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@tempo_minutos", servico.TempoMinutos);
                     comando.Parameters.AddWithValue("@preco", servico.Preco);
 
-                    servico.Id = Convert.ToInt32(comando.ExecuteScalar());
+                    int linhasAfetadas = comando.ExecuteNonQuery();
+                    return linhasAfetadas > 0;
                 }
             }
         }

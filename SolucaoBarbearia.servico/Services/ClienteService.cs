@@ -1,11 +1,14 @@
 ﻿using Dominio.Models;
+using SolucaoBarbearia.dominio.Interfaces;
 using SolucaoBarbearia.infra.Repositorios;
+using SolucaoBarbearia.servico.DTOs;
+using SolucaoBarbearia.servico.Interfaces;
 
-public class ClienteService
+public class ClienteService : IClienteService
 {
-    private readonly ClienteRepositorio _repositorio;
+    private readonly IClienteRepository _repositorio;
 
-    public ClienteService(ClienteRepositorio repositorio)
+    public ClienteService(IClienteRepository repositorio)
     {
         _repositorio = repositorio;
     }
@@ -17,16 +20,21 @@ public class ClienteService
 
     public Cliente BuscarPorId(int id)
     {
+        if (id <= 0)
+            throw new Exception("Id inválido.");
+
         return _repositorio.BuscarPorId(id);
     }
 
-    public void Cadastrar(Cliente cliente)
+    public bool Cadastrar(Cliente cliente)
     {
-        if (string.IsNullOrWhiteSpace(cliente.Email) &&
-    string.IsNullOrWhiteSpace(cliente.Telefone))
+        if (string.IsNullOrWhiteSpace(cliente.Nome))
         {
-            throw new Exception(
-                "Informe pelo menos um email ou telefone.");
+            return false;
+        }
+        if (string.IsNullOrWhiteSpace(cliente.Email) && string.IsNullOrWhiteSpace(cliente.Telefone))
+        {
+            throw new Exception("Informe pelo menos um email ou telefone.");
         }
 
         bool clienteExistente = _repositorio.ExisteEmailOuTelefone(cliente.Email, cliente.Telefone);
@@ -36,7 +44,7 @@ public class ClienteService
             throw new Exception("Já existe um cliente com esse email ou telefone.");
         }
 
-        _repositorio.Cadastrar(cliente);
+        return _repositorio.Cadastrar(cliente);
     }
 
     public void Atualizar(Cliente clienteAtualizado)
@@ -57,6 +65,13 @@ public class ClienteService
 
     public void Remover(int id)
     {
+        var cliente = _repositorio.BuscarPorId(id);
+
+        if (cliente == null)
+        {
+            throw new Exception("Cliente não encontrado.");
+        }
+
         _repositorio.Remover(id);
     }
 }

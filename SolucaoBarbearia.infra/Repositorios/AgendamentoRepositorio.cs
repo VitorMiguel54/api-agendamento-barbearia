@@ -1,6 +1,7 @@
 ﻿using Dominio.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using SolucaoBarbearia.dominio.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SolucaoBarbearia.infra.Repositorios
 {
-    public class AgendamentoRepositorio
+    public class AgendamentoRepositorio : IAgendamentoRepository
     {
         private readonly string _connectionString;
 
@@ -18,7 +19,7 @@ namespace SolucaoBarbearia.infra.Repositorios
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void Cadastrar(Agendamento agendamento)
+        public bool Cadastrar(Agendamento agendamento)
         {
             using (SqlConnection conexao = new SqlConnection(_connectionString))
             {
@@ -37,7 +38,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@data_agendamento", agendamento.DataAgendamento);
                     comando.Parameters.AddWithValue("@status", agendamento.Status);
 
-                    comando.ExecuteNonQuery();
+                    int linhasAfetadas = comando.ExecuteNonQuery();
+                    return linhasAfetadas > 0;
                 }
             }
         }
@@ -134,7 +136,6 @@ namespace SolucaoBarbearia.infra.Repositorios
             servico_loja_id = @servico_loja_id,
             profissional_id = @profissional_id,
             data_agendamento = @data_agendamento,
-            status = @status,
             data_atualizacao = SYSDATETIME()
         WHERE id = @id";
 
@@ -145,7 +146,6 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@servico_loja_id", agendamento.ServicoLojaId);
                     comando.Parameters.AddWithValue("@profissional_id", agendamento.ProfissionalId);
                     comando.Parameters.AddWithValue("@data_agendamento", agendamento.DataAgendamento);
-                    comando.Parameters.AddWithValue("@status", agendamento.Status);
 
                     comando.ExecuteNonQuery();
                 }

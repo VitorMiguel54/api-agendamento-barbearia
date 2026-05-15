@@ -1,11 +1,13 @@
 ﻿using Dominio.Models;
+using SolucaoBarbearia.dominio.Interfaces;
 using SolucaoBarbearia.infra.Repositorios;
+using SolucaoBarbearia.servico.Interfaces;
 
-public class LojaService
+public class LojaService : ILojaService
 {
-    private readonly LojaRepositorio _repositorio;
+    private readonly ILojaRepository _repositorio;
 
-    public LojaService(LojaRepositorio repositorio)
+    public LojaService(ILojaRepository repositorio)
     {
         _repositorio = repositorio;
     }
@@ -17,17 +19,32 @@ public class LojaService
 
     public Loja BuscarPorId(int id)
     {
+        if (id <= 0)
+            throw new Exception("Id inválido.");
+
         return _repositorio.BuscarPorId(id);
     }
 
-    public void Cadastrar(Loja loja)
+    public bool Cadastrar(Loja loja)
     {
+        if (string.IsNullOrWhiteSpace(loja.Nome))
+        {
+            return false;
+        }
+        if (loja.HoraAbertura == TimeSpan.Zero)
+        {
+            return false;
+        }
+        if (loja.HoraFechamento == TimeSpan.Zero)
+        {
+            return false;
+        }
         if (loja.HoraFechamento <= loja.HoraAbertura)
         {
-            throw new Exception(
-                "A hora de fechamento deve ser maior que a hora de abertura.");
+            return false;
         }
-        _repositorio.Cadastrar(loja);
+        
+        return _repositorio.Cadastrar(loja);
     }
 
     public void Atualizar(Loja lojaAtualizado)
@@ -42,6 +59,13 @@ public class LojaService
 
     public void Remover(int id)
     {
+        var loja = _repositorio.BuscarPorId(id);
+
+        if (loja == null)
+        {
+            throw new Exception("Loja não encontrada.");
+        }
+
         _repositorio.Remover(id);
     }
 }

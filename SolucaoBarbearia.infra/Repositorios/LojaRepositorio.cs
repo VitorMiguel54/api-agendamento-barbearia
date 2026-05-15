@@ -1,15 +1,11 @@
 ﻿using Dominio.Models;
+using global::SolucaoBarbearia.dominio.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SolucaoBarbearia.infra.Repositorios
 {
-    public class LojaRepositorio
+    public class LojaRepositorio : ILojaRepository
     {
         private readonly string _connectionString;
 
@@ -18,7 +14,7 @@ namespace SolucaoBarbearia.infra.Repositorios
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void Cadastrar(Loja loja)
+        public bool Cadastrar(Loja loja)
         {
             using (SqlConnection conexao = new SqlConnection(_connectionString))
             {
@@ -35,7 +31,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@hora_abertura", loja.HoraAbertura);
                     comando.Parameters.AddWithValue("@hora_fechamento", loja.HoraFechamento);
 
-                    comando.ExecuteNonQuery();
+                    int linhasAfetadas = comando.ExecuteNonQuery();
+                    return linhasAfetadas > 0;
                 }
             }
         }
@@ -159,6 +156,25 @@ namespace SolucaoBarbearia.infra.Repositorios
                 {
                     comando.Parameters.AddWithValue("@id", id);
                     comando.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public bool Existe(int id)
+        {
+            using (SqlConnection conexao = new SqlConnection(_connectionString))
+            {
+                conexao.Open();
+
+                string sql = "SELECT COUNT(1) FROM tb_loja WHERE id = @id";
+
+                using (SqlCommand comando = new SqlCommand(sql, conexao))
+                {
+                    comando.Parameters.AddWithValue("@id", id);
+
+                    int quantidade = (int)comando.ExecuteScalar();
+
+                    return quantidade > 0;
                 }
             }
         }

@@ -15,6 +15,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolucaoBarbearia.api", "Sol
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolucaoBarbearia.servico", "SolucaoBarbearia.servico\SolucaoBarbearia.servico.csproj", "{A26C06A1-6757-4EC6-B1A2-0119B888149D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolucaoBarbeariaTests", "SolucaoBarbeariaTests\SolucaoBarbeariaTests.csproj", "{C23451B1-9AFB-4C7A-AA57-2D1C0D957739}"
+	ProjectSection(ProjectDependencies) = postProject
+		{73F54A76-8AC9-4F51-A8D3-CB5B8E54B0F3} = {73F54A76-8AC9-4F51-A8D3-CB5B8E54B0F3}
+		{9D3FDF36-72B4-481C-A993-6977E5145EA5} = {9D3FDF36-72B4-481C-A993-6977E5145EA5}
+		{A26C06A1-6757-4EC6-B1A2-0119B888149D} = {A26C06A1-6757-4EC6-B1A2-0119B888149D}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8A602DC1-38C1-4849-958E-2D6D3189C8C4}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +49,10 @@ Global
 		{A26C06A1-6757-4EC6-B1A2-0119B888149D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A26C06A1-6757-4EC6-B1A2-0119B888149D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A26C06A1-6757-4EC6-B1A2-0119B888149D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C23451B1-9AFB-4C7A-AA57-2D1C0D957739}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C23451B1-9AFB-4C7A-AA57-2D1C0D957739}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C23451B1-9AFB-4C7A-AA57-2D1C0D957739}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C23451B1-9AFB-4C7A-AA57-2D1C0D957739}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +62,7 @@ Global
 		{73F54A76-8AC9-4F51-A8D3-CB5B8E54B0F3} = {BE1C6866-866D-4F00-8DB6-67E3AB7FABBF}
 		{16D56851-B0E6-4AD2-BC75-BC7F6E00ECD9} = {BE1C6866-866D-4F00-8DB6-67E3AB7FABBF}
 		{A26C06A1-6757-4EC6-B1A2-0119B888149D} = {BE1C6866-866D-4F00-8DB6-67E3AB7FABBF}
+		{C23451B1-9AFB-4C7A-AA57-2D1C0D957739} = {2E2D6E70-3022-492A-A4AE-EF9860788463}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9B54E313-A5A5-4EA0-B5AA-EE6E28F45C99}

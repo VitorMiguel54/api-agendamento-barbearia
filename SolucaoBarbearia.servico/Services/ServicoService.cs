@@ -1,20 +1,22 @@
 ﻿using Dominio.Models;
+using SolucaoBarbearia.dominio.Interfaces;
 using SolucaoBarbearia.infra.Repositorios;
+using SolucaoBarbearia.servico.Interfaces;
 
-public class ServicoService
+public class ServicoService : IServicoService
 {
-    private readonly ServicoRepositorio _repositorio;
-    private readonly ServicoLojaRepositorio _servicoLojaRepositorio;
+    private readonly IServicoRepository _repositorio;
+    private readonly IServicoLojaRepository _servicoLojaRepositorio;
 
-    public ServicoService(ServicoRepositorio repositorio, ServicoLojaRepositorio servicoLojaRepositorio)
+    public ServicoService(IServicoRepository repositorio, IServicoLojaRepository servicoLojaRepositorio)
     {
         _repositorio = repositorio;
         _servicoLojaRepositorio = servicoLojaRepositorio;
     }
 
-    public List<dynamic> ListarServicosLoja()
+    public List<ServicoLoja> ListarServicosLoja()
     {
-        return _repositorio.ListarServicosLoja();
+        return _servicoLojaRepositorio.Listar();
     }
 
     public List<Servico> Listar()
@@ -24,35 +26,67 @@ public class ServicoService
 
     public Servico BuscarPorId(int id)
     {
+        if (id <= 0)
+            throw new Exception("Id inválido.");
+
         return _repositorio.BuscarPorId(id);
     }
 
-    public void Cadastrar(Servico servico)
+    public bool Cadastrar(Servico servico)
     {
-        _repositorio.Cadastrar(servico);
+        if (servico == null)
+            throw new Exception("Serviço inválido.");
 
-        var servicoLoja = new ServicoLoja
-        {
-            LojaId = servico.LojaId,
-            ServicoId = servico.Id,
-            Preco = servico.Preco,
-            TempoMinutos = servico.TempoMinutos,
-            Ativo = true
-        };
-        _servicoLojaRepositorio.Criar(servicoLoja);
+        if (servico.LojaId <= 0)
+            throw new Exception("Loja inválida.");
+
+        if (servico.Preco <= 0)
+            throw new Exception("Preço inválido.");
+
+        if (servico.TempoMinutos < 10)
+            throw new Exception("Tempo inválido.");
+
+        if (string.IsNullOrWhiteSpace(servico.Nome))
+            return false;
+
+        var loja = _servicoLojaRepositorio.BuscarPorId(servico.LojaId);
+
+        if (loja == null)
+            throw new Exception("Loja não encontrada.");
+
+        return _repositorio.Cadastrar(servico);
     }
 
     public void Atualizar(Servico servicoAtualizado)
     {
+        if (servicoAtualizado.LojaId <= 0)
+        {
+            throw new Exception("Loja inválida.");
+        }
         if (string.IsNullOrWhiteSpace(servicoAtualizado.Nome))
         {
             throw new Exception("Nome obrigatório.");
+        }
+        if (servicoAtualizado.TempoMinutos < 10)
+        {
+            throw new Exception("Tempo inválido.");
+        }
+        if (servicoAtualizado.Preco < 10)
+        {
+            throw new Exception("Preço inválido.");
         }
         _repositorio.Atualizar(servicoAtualizado);
     }
 
     public void Remover(int id)
     {
+        var servico = _repositorio.BuscarPorId(id);
+
+        if (servico == null)
+        {
+            throw new Exception("Serviço não encontrado.");
+        }
+
         _repositorio.Remover(id);
     }
 }

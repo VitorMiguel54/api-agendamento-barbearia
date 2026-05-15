@@ -1,15 +1,16 @@
 ﻿using Dominio.Models;
-using SolucaoBarbearia.infra.Repositorios;
+using SolucaoBarbearia.dominio.Interfaces;
+using SolucaoBarbearia.servico.Interfaces;
 
-public class AgendamentoService
+public class AgendamentoService : IAgendamentoService
 {
-    private readonly AgendamentoRepositorio _repositorio;
-    private readonly ClienteRepositorio _clienteRepositorio;
-    private readonly ProfissionalRepositorio _profissionalRepositorio;
-    private readonly ServicoRepositorio _servicoRepositorio;
-    private readonly LojaRepositorio _lojaRepositorio;
+    private readonly IAgendamentoRepository _repositorio;
+    private readonly IClienteRepository _clienteRepositorio;
+    private readonly IProfissionalRepository _profissionalRepositorio;
+    private readonly IServicoRepository _servicoRepositorio;
+    private readonly ILojaRepository _lojaRepositorio;
 
-    public AgendamentoService(AgendamentoRepositorio repositorio, ClienteRepositorio clienteRepositorio, ProfissionalRepositorio profissionalRepositorio, ServicoRepositorio servicoRepositorio, LojaRepositorio lojaRepositorio)
+    public AgendamentoService(IAgendamentoRepository repositorio, IClienteRepository clienteRepositorio, IProfissionalRepository profissionalRepositorio, IServicoRepository servicoRepositorio, ILojaRepository lojaRepositorio)
     {
         _repositorio = repositorio;
         _clienteRepositorio = clienteRepositorio;
@@ -28,7 +29,7 @@ public class AgendamentoService
         return _repositorio.BuscarPorId(id);
     }
 
-    public void Cadastrar(Agendamento agendamento)
+    public bool Cadastrar(Agendamento agendamento)
     {
         agendamento.Status = "PENDENTE";
 
@@ -98,7 +99,7 @@ public class AgendamentoService
                 throw new Exception("Horário indisponível.");
         }
 
-        _repositorio.Cadastrar(agendamento);
+        return _repositorio.Cadastrar(agendamento);
     }
 
     public void Atualizar(Agendamento agendamentoAtualizado)

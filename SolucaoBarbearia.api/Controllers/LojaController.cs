@@ -1,15 +1,16 @@
 ﻿using Dominio.Models;
 using Microsoft.AspNetCore.Mvc;
 using SolucaoBarbearia.api.DTOs;
+using SolucaoBarbearia.servico.Interfaces;
 
 [ApiController]
 [Route("[controller]")]
 
 public class LojaController : ControllerBase
 {
-    private readonly LojaService _service;
+    private readonly ILojaService _service;
 
-    public LojaController(LojaService service)
+    public LojaController(ILojaService service)
     {
         _service = service;
     }

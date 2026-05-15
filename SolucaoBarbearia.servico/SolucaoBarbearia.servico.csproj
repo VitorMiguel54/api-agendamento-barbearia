@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SolucaoBarbearia.infra\SolucaoBarbearia.infra.csproj" />
     <ProjectReference Include="..\SolucoaBarbearia.dominio\SolucaoBarbearia.dominio.csproj" />
   </ItemGroup>

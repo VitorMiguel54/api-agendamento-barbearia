@@ -1,105 +1,92 @@
-﻿using Dominio.Models;
-using Microsoft.AspNetCore.Mvc;
-using SolucaoBarbearia.api.DTOs;
+﻿//using Microsoft.AspNetCore.Mvc;
+//using SolucaoBarbearia.api.DTOs;
+//using Barbearia.Service.Interfaces;
+//using SolucaoBarbearia.servico.DTOs;
 
-[ApiController]
-[Route("api/[controller]")]
-public class ClienteController : ControllerBase
-{
-    private readonly ClienteService _service;
+//[ApiController]
+//[Route("api/[controller]")]
+//public class ClienteController : ControllerBase
+//{
+//    private readonly IClienteService _service;
 
-    public ClienteController(ClienteService service)
-    {
-        _service = service;
-    }
+//    public ClienteController(IClienteService service)
+//    {
+//        _service = service;
+//    }
 
-    [HttpGet]
-    public IActionResult Get()
-    {
-        var clientes = _service.Listar()
-            .Select(c => new ClienteDTO
-            {
-                Id = c.Id,
-                Nome = c.Nome,
-                Telefone = c.Telefone,
-                Email = c.Email
-            });
+//    [HttpGet]
+//    public async Task<IActionResult> Get()
+//    {
+//        var clientes = await _service.ObterTodosAsync();
 
-        return Ok(clientes);
-    }
+//        var resultado = clientes.Select(c => new ClienteDTO
+//        {
+//            Id = c.Id,
+//            Nome = c.Nome,
+//            Telefone = c.Telefone,
+//            Email = c.Email
+//        });
 
-    [HttpGet("{id}")]
-    public IActionResult GetById(int id)
-    {
-        var cliente = _service.BuscarPorId(id);
+//        return Ok(resultado);
+//    }
 
-        if (cliente == null)
-        {
-            return NotFound("Cliente não encontrado.");
-        }
+//    [HttpGet("{id}")]
+//    public async Task<IActionResult> GetById(int id)
+//    {
+//        var cliente = await _service.ObterPorIdAsync(id);
 
-        return Ok(new
-        {
-            Id = cliente.Id,
-            Nome = cliente.Nome,
-            Telefone = cliente.Telefone,
-            Email = cliente.Email
-        });
-    }
+//        if (cliente == null)
+//        {
+//            return NotFound("Cliente não encontrado.");
+//        }
 
-    [HttpPost]
-    public IActionResult Post([FromBody] CriarClienteDTO dto)
-    {
-        try
-        {
-            var cliente = new Cliente
-            {
-                Nome = dto.Nome,
-                Email = dto.Email,
-                Telefone = dto.Telefone
-            };
+//        return Ok(new ClienteDTO
+//        {
+//            Id = cliente.Id,
+//            Nome = cliente.Nome,
+//            Telefone = cliente.Telefone,
+//            Email = cliente.Email
+//        });
+//    }
 
-            _service.Cadastrar(cliente);
+//    [HttpPost]
+//    public async Task<IActionResult> Post([FromBody] ClienteCadastroDto dto)
+//    {
+//        try
+//        {
+//            await _service.CadastrarAsync(dto);
 
-            return Ok("Cliente cadastrado com sucesso");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
+//            return Ok("Cliente cadastrado com sucesso");
+//        }
+//        catch (Exception ex)
+//        {
+//            return BadRequest(ex.Message);
+//        }
+//    }
 
-    [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] ClienteDTO dto)
-    {
-        var existente = _service.BuscarPorId(id);
+//    [HttpPut("{id}")]
+//    public async Task<IActionResult> Put(int id, [FromBody] ClienteCadastroDto dto)
+//    {
+//        var existente = await _service.ObterPorIdAsync(id);
 
-        if (existente == null)
-            return NotFound("Cliente não encontrado!");
+//        if (existente == null)
+//            return NotFound("Cliente não encontrado!");
 
-        var clienteAtualizado = new Cliente
-        {
-            Id = id,
-            Nome = dto.Nome,
-            Telefone = dto.Telefone,
-            Email = dto.Email
-        };
+//        await _service.AtualizarAsync(id, dto);
 
-        _service.Atualizar(clienteAtualizado);
+//        return Ok("Cliente atualizado com sucesso!");
+//    }
 
-        return Ok("Cliente atualizado com sucesso!");
-    }
+//    [HttpDelete("{id}")]
+//    public async Task<IActionResult> Delete(int id)
+//    {
+//        var cliente = await _service.ObterPorIdAsync(id);
 
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
-    {
-        var cliente = _service.BuscarPorId(id);
+//        if (cliente == null)
+//            return NotFound("Cliente não encontrado!");
 
-        if (cliente == null)
-            return NotFound("Cliente não encontrado!");
+//        await _service.RemoverAsync(id);
 
-        _service.Remover(id);
-
-        return Ok("Excluído com sucesso!");
-    }
-}
+//        return Ok("Excluído com sucesso!");
+//    }
+//}

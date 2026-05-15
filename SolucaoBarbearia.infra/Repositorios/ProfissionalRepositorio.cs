@@ -1,15 +1,11 @@
 ﻿using Dominio.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SolucaoBarbearia.dominio.Interfaces;
 
 namespace SolucaoBarbearia.infra.Repositorios
 {
-    public class ProfissionalRepositorio
+    public class ProfissionalRepositorio : IProfissionalRepository
     {
         private readonly string _connectionString;
 
@@ -18,7 +14,7 @@ namespace SolucaoBarbearia.infra.Repositorios
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void Cadastrar(Profissional profissional)
+        public bool Cadastrar(Profissional profissional)
         {
             using (SqlConnection conexao = new SqlConnection(_connectionString))
             {
@@ -34,7 +30,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@loja_id", profissional.LojaId);
                     comando.Parameters.AddWithValue("@nome", profissional.Nome);
 
-                    comando.ExecuteNonQuery();
+                    int linhasAfetadas = comando.ExecuteNonQuery();
+                    return linhasAfetadas > 0;
                 }
             }
         }

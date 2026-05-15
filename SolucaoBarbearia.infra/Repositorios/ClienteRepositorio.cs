@@ -1,16 +1,17 @@
-﻿using Dominio.Models;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using SolucaoBarbearia.dominio.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dominio.Models;
 
 namespace SolucaoBarbearia.infra.Repositorios
 {
-    public class ClienteRepositorio
+    public class ClienteRepositorio : IClienteRepository
     {
         private readonly string _connectionString;
 
@@ -19,7 +20,7 @@ namespace SolucaoBarbearia.infra.Repositorios
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public Cliente Cadastrar(Cliente cliente)
+        public bool Cadastrar(Cliente cliente)
         {
             using (SqlConnection conexao = new SqlConnection(_connectionString))
             {
@@ -37,10 +38,10 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@telefone", cliente.Telefone);
                     comando.Parameters.AddWithValue("@email", cliente.Email);
 
-                    cliente.Id = Convert.ToInt32(comando.ExecuteScalar());
+                    int linhasAfetadas = comando.ExecuteNonQuery();
+                    return linhasAfetadas > 0;
                 }
             }
-            return cliente;
         }
 
         public bool ExisteEmailOuTelefone(string email, string telefone)
@@ -52,10 +53,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                 string sql = @"
                 SELECT COUNT(*)
                 FROM tb_cliente
-                WHERE 
-                (@email <> '' AND email = @email)
-                OR
-                (@telefone <> '' AND telefone = @telefone)";
+                WHERE email = @email OR telefone = @telefone";
 
                 using (SqlCommand comando = new SqlCommand(sql, conexao))
                 {
