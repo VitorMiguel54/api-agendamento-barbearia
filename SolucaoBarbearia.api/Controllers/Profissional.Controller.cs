@@ -1,15 +1,17 @@
-﻿using Dominio.Models;
+using Dominio.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SolucaoBarbearia.api.DTOs;
+using SolucaoBarbearia.servico.Interfaces;
 
 [ApiController]
-[Route("[controller]")]
-
+[Authorize]
+[Route("api/[controller]")]
 public class ProfissionalController : ControllerBase
 {
-    private readonly ProfissionalService _service;
+    private readonly IProfissionalService _service;
 
-    public ProfissionalController(ProfissionalService service)
+    public ProfissionalController(IProfissionalService service)
     {
         _service = service;
     }
@@ -23,7 +25,6 @@ public class ProfissionalController : ControllerBase
                 Id = p.Id,
                 LojaId = p.LojaId,
                 Nome = p.Nome
-
             }));
     }
 
@@ -55,7 +56,7 @@ public class ProfissionalController : ControllerBase
         };
 
         _service.Cadastrar(profissional);
-        return Ok("Profissional cadastrado com sucesso");
+        return CreatedAtAction(nameof(GetById), new { id = profissional.Id }, "Profissional cadastrado com sucesso");
     }
 
     [HttpPut("{id}")]
@@ -75,7 +76,7 @@ public class ProfissionalController : ControllerBase
 
         _service.Atualizar(profissionalAtualizado);
 
-        return Ok("Atualizado com sucesso!");
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -88,6 +89,6 @@ public class ProfissionalController : ControllerBase
 
         _service.Remover(id);
 
-        return Ok("Excluído com sucesso!");
+        return NoContent();
     }
 }

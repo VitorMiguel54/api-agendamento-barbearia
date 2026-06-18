@@ -38,8 +38,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@telefone", cliente.Telefone);
                     comando.Parameters.AddWithValue("@email", cliente.Email);
 
-                    int linhasAfetadas = comando.ExecuteNonQuery();
-                    return linhasAfetadas > 0;
+                    cliente.Id = Convert.ToInt32(comando.ExecuteScalar());
+                    return cliente.Id > 0;
                 }
             }
         }

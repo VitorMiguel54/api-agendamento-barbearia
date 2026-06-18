@@ -24,22 +24,57 @@ namespace SolucaoBarbearia.infra.Repositorios
             using (SqlConnection conexao = new SqlConnection(_connectionString))
             {
                 conexao.Open();
+                using (SqlTransaction transacao = conexao.BeginTransaction(System.Data.IsolationLevel.Serializable))
+                {
+                    string sqlDuracao = @"SELECT tempo_minutos
+                                          FROM tb_servico_loja
+                                          WHERE id = @servico_loja_id AND ativo = 1";
 
-                string sql = @"INSERT INTO tb_agendamento
+                    int? duracaoMinutos = null;
+
+                    using (SqlCommand comandoDuracao = new SqlCommand(sqlDuracao, conexao, transacao))
+                    {
+                        comandoDuracao.Parameters.AddWithValue("@servico_loja_id", agendamento.ServicoLojaId);
+                        var resultado = comandoDuracao.ExecuteScalar();
+
+                        if (resultado != null && resultado != DBNull.Value)
+                        {
+                            duracaoMinutos = Convert.ToInt32(resultado);
+                        }
+                    }
+
+                    if (duracaoMinutos == null)
+                    {
+                        transacao.Rollback();
+                        throw new Exception("Serviço não encontrado.");
+                    }
+
+                    DateTime fimAgendamento = agendamento.DataAgendamento.AddMinutes(duracaoMinutos.Value);
+
+                    if (ExisteConflitoTransacao(conexao, transacao, agendamento.ProfissionalId, agendamento.DataAgendamento, fimAgendamento, null))
+                    {
+                        transacao.Rollback();
+                        throw new Exception("Horário indisponível.");
+                    }
+
+                    string sql = @"INSERT INTO tb_agendamento
                 (cliente_id, servico_loja_id, profissional_id, data_agendamento, status)
+                OUTPUT INSERTED.id
                 VALUES 
                 (@cliente_id, @servico_loja_id, @profissional_id, @data_agendamento, @status)";
 
-                using (SqlCommand comando = new SqlCommand(sql, conexao))
-                {
-                    comando.Parameters.AddWithValue("@cliente_id", agendamento.ClienteId);
-                    comando.Parameters.AddWithValue("@servico_loja_id", agendamento.ServicoLojaId);
-                    comando.Parameters.AddWithValue("@profissional_id", agendamento.ProfissionalId);
-                    comando.Parameters.AddWithValue("@data_agendamento", agendamento.DataAgendamento);
-                    comando.Parameters.AddWithValue("@status", agendamento.Status);
+                    using (SqlCommand comando = new SqlCommand(sql, conexao, transacao))
+                    {
+                        comando.Parameters.AddWithValue("@cliente_id", agendamento.ClienteId);
+                        comando.Parameters.AddWithValue("@servico_loja_id", agendamento.ServicoLojaId);
+                        comando.Parameters.AddWithValue("@profissional_id", agendamento.ProfissionalId);
+                        comando.Parameters.AddWithValue("@data_agendamento", agendamento.DataAgendamento);
+                        comando.Parameters.AddWithValue("@status", agendamento.Status);
 
-                    int linhasAfetadas = comando.ExecuteNonQuery();
-                    return linhasAfetadas > 0;
+                        agendamento.Id = Convert.ToInt32(comando.ExecuteScalar());
+                        transacao.Commit();
+                        return agendamento.Id > 0;
+                    }
                 }
             }
         }
@@ -121,6 +156,45 @@ namespace SolucaoBarbearia.infra.Repositorios
             }
 
             return null;
+        }
+
+        public bool ExisteConflito(int profissionalId, DateTime inicio, DateTime fim, int? agendamentoIgnoradoId = null)
+        {
+            using (SqlConnection conexao = new SqlConnection(_connectionString))
+            {
+                conexao.Open();
+                return ExisteConflitoTransacao(conexao, null, profissionalId, inicio, fim, agendamentoIgnoradoId);
+            }
+        }
+
+        private static bool ExisteConflitoTransacao(
+            SqlConnection conexao,
+            SqlTransaction? transacao,
+            int profissionalId,
+            DateTime inicio,
+            DateTime fim,
+            int? agendamentoIgnoradoId)
+        {
+            string sql = @"
+        SELECT COUNT(1)
+        FROM tb_agendamento a WITH (UPDLOCK, HOLDLOCK)
+        INNER JOIN tb_servico_loja sl ON sl.id = a.servico_loja_id
+        WHERE a.profissional_id = @profissional_id
+          AND a.status IN ('PENDENTE', 'CONFIRMADO')
+          AND (@agendamento_ignorado_id IS NULL OR a.id <> @agendamento_ignorado_id)
+          AND @inicio < DATEADD(MINUTE, sl.tempo_minutos, a.data_agendamento)
+          AND @fim > a.data_agendamento";
+
+            using (SqlCommand comando = new SqlCommand(sql, conexao, transacao))
+            {
+                comando.Parameters.AddWithValue("@profissional_id", profissionalId);
+                comando.Parameters.AddWithValue("@inicio", inicio);
+                comando.Parameters.AddWithValue("@fim", fim);
+                comando.Parameters.AddWithValue("@agendamento_ignorado_id", agendamentoIgnoradoId.HasValue ? agendamentoIgnoradoId.Value : DBNull.Value);
+
+                int quantidade = Convert.ToInt32(comando.ExecuteScalar());
+                return quantidade > 0;
+            }
         }
 
         public void Atualizar(Agendamento agendamento)

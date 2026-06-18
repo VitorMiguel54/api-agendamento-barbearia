@@ -6,6 +6,8 @@ namespace SolucaoBarbearia.servico.Interfaces
     {
         List<Servico> Listar();
 
+        List<ServicoLoja> ListarServicosLoja();
+
         Servico BuscarPorId(int id);
 
         bool Cadastrar(Servico servico);

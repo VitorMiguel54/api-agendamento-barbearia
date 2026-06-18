@@ -22,6 +22,7 @@ namespace SolucaoBarbearia.infra.Repositorios
 
                 string sql = @"INSERT INTO tb_profissional 
                 (loja_id, nome)
+                OUTPUT INSERTED.id
                 VALUES 
                 (@loja_id, @nome)";
 
@@ -30,8 +31,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@loja_id", profissional.LojaId);
                     comando.Parameters.AddWithValue("@nome", profissional.Nome);
 
-                    int linhasAfetadas = comando.ExecuteNonQuery();
-                    return linhasAfetadas > 0;
+                    profissional.Id = Convert.ToInt32(comando.ExecuteScalar());
+                    return profissional.Id > 0;
                 }
             }
         }

@@ -1,16 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SolucaoBarbearia.api.DTOs;
 using Dominio.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SolucaoBarbearia.api.DTOs;
+using SolucaoBarbearia.servico.Interfaces;
 
 namespace SolucaoBarbearia.api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class AgendamentoController : ControllerBase
 {
-    private readonly AgendamentoService _service;
+    private readonly IAgendamentoService _service;
 
-    public AgendamentoController(AgendamentoService service)
+    public AgendamentoController(IAgendamentoService service)
     {
         _service = service;
     }
@@ -29,7 +32,7 @@ public class AgendamentoController : ControllerBase
             };
 
             _service.Cadastrar(agendamento);
-            return Ok("Agendamento criado com sucesso!");
+            return CreatedAtAction(nameof(GetById), new { id = agendamento.Id }, "Agendamento criado com sucesso!");
         }
         catch (Exception ex)
         {
@@ -76,7 +79,7 @@ public class AgendamentoController : ControllerBase
 
             _service.Atualizar(agendamentoAtualizado);
 
-            return Ok("Atualizado com sucesso!");
+            return NoContent();
         }
         catch (Exception ex)
         {
@@ -94,6 +97,6 @@ public class AgendamentoController : ControllerBase
 
         _service.Remover(id);
 
-        return Ok("Excluído com sucesso!");
+        return NoContent();
     }
 }

@@ -7,15 +7,15 @@ public class AgendamentoService : IAgendamentoService
     private readonly IAgendamentoRepository _repositorio;
     private readonly IClienteRepository _clienteRepositorio;
     private readonly IProfissionalRepository _profissionalRepositorio;
-    private readonly IServicoRepository _servicoRepositorio;
+    private readonly IServicoLojaRepository _servicoLojaRepositorio;
     private readonly ILojaRepository _lojaRepositorio;
 
-    public AgendamentoService(IAgendamentoRepository repositorio, IClienteRepository clienteRepositorio, IProfissionalRepository profissionalRepositorio, IServicoRepository servicoRepositorio, ILojaRepository lojaRepositorio)
+    public AgendamentoService(IAgendamentoRepository repositorio, IClienteRepository clienteRepositorio, IProfissionalRepository profissionalRepositorio, IServicoLojaRepository servicoLojaRepositorio, ILojaRepository lojaRepositorio)
     {
         _repositorio = repositorio;
         _clienteRepositorio = clienteRepositorio;
         _profissionalRepositorio = profissionalRepositorio;
-        _servicoRepositorio = servicoRepositorio;
+        _servicoLojaRepositorio = servicoLojaRepositorio;
         _lojaRepositorio = lojaRepositorio;
     }
 
@@ -32,6 +32,13 @@ public class AgendamentoService : IAgendamentoService
     public bool Cadastrar(Agendamento agendamento)
     {
         agendamento.Status = "PENDENTE";
+        ValidarAgendamento(agendamento);
+
+        return _repositorio.Cadastrar(agendamento);
+    }
+
+    private void ValidarAgendamento(Agendamento agendamento, int? agendamentoIgnoradoId = null)
+    {
 
         if (agendamento.DataAgendamento < DateTime.Now)
             throw new Exception("Não é possível agendar no passado.");
@@ -52,13 +59,13 @@ public class AgendamentoService : IAgendamentoService
         if (profissional == null)
             throw new Exception("Profissional não encontrado.");
 
-        var servico = _servicoRepositorio.BuscarPorId(agendamento.ServicoLojaId);
+        var servicoLoja = _servicoLojaRepositorio.BuscarPorId(agendamento.ServicoLojaId);
 
-        if (servico == null)
+        if (servicoLoja == null)
             throw new Exception("Serviço não encontrado.");
 
         var inicioNovo = agendamento.DataAgendamento;
-        var fimNovo = inicioNovo.AddMinutes(servico.TempoMinutos);
+        var fimNovo = inicioNovo.AddMinutes(servicoLoja.TempoMinutos);
 
         var loja = _lojaRepositorio.BuscarPorId(profissional.LojaId);
 
@@ -77,33 +84,13 @@ public class AgendamentoService : IAgendamentoService
                 "O serviço termina após o fechamento.");
         }
 
-        var agendamentos = _repositorio.Listar();
-
-        foreach (var existente in agendamentos)
-        {
-            if (existente.ProfissionalId != agendamento.ProfissionalId)
-                continue;
-
-            var servicoExistente = _servicoRepositorio.BuscarPorId(existente.ServicoLojaId);
-
-            if (servicoExistente == null)
-                continue;
-
-            var inicioExistente = existente.DataAgendamento;
-            var fimExistente = inicioExistente.AddMinutes(servicoExistente.TempoMinutos);
-
-            bool conflito = inicioNovo < fimExistente &&
-                            fimNovo > inicioExistente;
-
-            if (conflito)
-                throw new Exception("Horário indisponível.");
-        }
-
-        return _repositorio.Cadastrar(agendamento);
+        if (_repositorio.ExisteConflito(agendamento.ProfissionalId, inicioNovo, fimNovo, agendamentoIgnoradoId))
+            throw new Exception("Horário indisponível.");
     }
 
     public void Atualizar(Agendamento agendamentoAtualizado)
     {
+        ValidarAgendamento(agendamentoAtualizado, agendamentoAtualizado.Id);
         _repositorio.Atualizar(agendamentoAtualizado);
     }
 

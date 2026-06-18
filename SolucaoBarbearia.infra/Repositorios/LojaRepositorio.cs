@@ -22,6 +22,7 @@ namespace SolucaoBarbearia.infra.Repositorios
 
                 string sql = @"INSERT INTO tb_loja 
                 (nome, hora_abertura, hora_fechamento)
+                OUTPUT INSERTED.id
                 VALUES 
                 (@nome, @hora_abertura, @hora_fechamento)";
 
@@ -31,8 +32,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@hora_abertura", loja.HoraAbertura);
                     comando.Parameters.AddWithValue("@hora_fechamento", loja.HoraFechamento);
 
-                    int linhasAfetadas = comando.ExecuteNonQuery();
-                    return linhasAfetadas > 0;
+                    loja.Id = Convert.ToInt32(comando.ExecuteScalar());
+                    return loja.Id > 0;
                 }
             }
         }

@@ -2,7 +2,7 @@ CREATE TABLE tb_cliente (
 	id INT IDENTITY PRIMARY KEY,
 	nome VARCHAR(50) NOT NULL,
 	telefone VARCHAR(20),
-	email VARCHAR(100) NOT NULL,
+	email VARCHAR(100),
 	data_criacao DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
 	data_atualizacao DATETIME NULL,
 	ativo BIT DEFAULT 1
@@ -12,6 +12,8 @@ GO
 CREATE TABLE tb_loja (
 	id INT IDENTITY PRIMARY KEY,
 	nome VARCHAR(100) NOT NULL,
+	hora_abertura TIME NOT NULL,
+	hora_fechamento TIME NOT NULL,
 	data_criacao DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
 	data_atualizacao DATETIME NULL,
 	ativo BIT DEFAULT 1
@@ -32,13 +34,16 @@ GO
 
 CREATE TABLE tb_servico (
 	id INT IDENTITY PRIMARY KEY,
+	loja_id INT NOT NULL,
 	nome VARCHAR(50) NOT NULL,
 	descricao VARCHAR(100),
 	tempo_minutos INT NOT NULL,
 	preco DECIMAL(10,2) NOT NULL,
 	data_criacao DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
 	data_atualizacao DATETIME NULL,
-	ativo BIT DEFAULT 1
+	ativo BIT DEFAULT 1,
+
+	CONSTRAINT fk_servico_loja_cadastro FOREIGN KEY (loja_id) REFERENCES tb_loja(id)
 );
 GO
 
@@ -55,6 +60,15 @@ CREATE TABLE tb_servico_loja (
 );
 GO
 
+CREATE INDEX ix_cliente_email ON tb_cliente(email) WHERE email IS NOT NULL;
+GO
+
+CREATE INDEX ix_cliente_telefone ON tb_cliente(telefone) WHERE telefone IS NOT NULL;
+GO
+
+CREATE INDEX ix_servico_loja_ativo ON tb_servico_loja(loja_id, servico_id, ativo);
+GO
+
 CREATE TABLE tb_agendamento (
 	id INT IDENTITY PRIMARY KEY,
 	cliente_id INT NOT NULL,
@@ -69,4 +83,8 @@ CREATE TABLE tb_agendamento (
     CONSTRAINT fk_servico_loja FOREIGN KEY (servico_loja_id) REFERENCES tb_servico_loja(id),
 	CONSTRAINT fk_profissional FOREIGN KEY (profissional_id) REFERENCES tb_profissional(id)
 );
+GO
+
+CREATE INDEX ix_agendamento_profissional_data_status
+ON tb_agendamento(profissional_id, data_agendamento, status);
 GO

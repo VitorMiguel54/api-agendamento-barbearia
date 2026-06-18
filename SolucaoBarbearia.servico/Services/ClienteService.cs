@@ -1,6 +1,5 @@
 ﻿using Dominio.Models;
 using SolucaoBarbearia.dominio.Interfaces;
-using SolucaoBarbearia.infra.Repositorios;
 using SolucaoBarbearia.servico.DTOs;
 using SolucaoBarbearia.servico.Interfaces;
 

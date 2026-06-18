@@ -12,6 +12,7 @@ namespace SolucaoBarbearia.dominio.Interfaces
         bool Cadastrar(Agendamento agendamento);
         List<Agendamento> Listar();
         Agendamento BuscarPorId(int id);
+        bool ExisteConflito(int profissionalId, DateTime inicio, DateTime fim, int? agendamentoIgnoradoId = null);
         void Atualizar(Agendamento agendamento);
         void Remover(int id);
     }

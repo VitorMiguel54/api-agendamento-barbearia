@@ -1,10 +1,12 @@
 ﻿using Dominio.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SolucaoBarbearia.api.DTOs;
 using SolucaoBarbearia.servico.Interfaces;
 
 [ApiController]
-[Route("[controller]")]
+[Authorize]
+[Route("api/[controller]")]
 
 public class LojaController : ControllerBase
 {
@@ -58,7 +60,7 @@ public class LojaController : ControllerBase
         };
 
         _service.Cadastrar(loja);
-        return Ok("Loja cadastrada com sucesso!");
+        return CreatedAtAction(nameof(GetById), new { id = loja.Id }, "Loja cadastrada com sucesso!");
     }
 
     [HttpPut("{id}")]
@@ -79,7 +81,7 @@ public class LojaController : ControllerBase
 
         _service.Atualizar(lojaAtualizado);
 
-        return Ok("Atualizado com sucesso!");
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -92,6 +94,6 @@ public class LojaController : ControllerBase
 
         _service.Remover(id);
 
-        return Ok("Excluído com sucesso!");
+        return NoContent();
     }
 }

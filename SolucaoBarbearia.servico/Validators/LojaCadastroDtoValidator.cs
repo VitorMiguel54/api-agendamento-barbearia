@@ -1,9 +1,6 @@
 ﻿using System.Data;
 using SolucaoBarbearia.servico.DTOs;
 using FluentValidation;
-using SolucaoBarbearia.dominio.Interfaces;
-using SolucaoBarbearia.infra.Repositorios;
-using Microsoft.Data.SqlClient;
 
 namespace Barbearia.Service.Validators;
 

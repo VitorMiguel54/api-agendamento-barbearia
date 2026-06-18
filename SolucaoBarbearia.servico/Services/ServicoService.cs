@@ -1,17 +1,18 @@
 ﻿using Dominio.Models;
 using SolucaoBarbearia.dominio.Interfaces;
-using SolucaoBarbearia.infra.Repositorios;
 using SolucaoBarbearia.servico.Interfaces;
 
 public class ServicoService : IServicoService
 {
     private readonly IServicoRepository _repositorio;
     private readonly IServicoLojaRepository _servicoLojaRepositorio;
+    private readonly ILojaRepository _lojaRepositorio;
 
-    public ServicoService(IServicoRepository repositorio, IServicoLojaRepository servicoLojaRepositorio)
+    public ServicoService(IServicoRepository repositorio, IServicoLojaRepository servicoLojaRepositorio, ILojaRepository lojaRepositorio)
     {
         _repositorio = repositorio;
         _servicoLojaRepositorio = servicoLojaRepositorio;
+        _lojaRepositorio = lojaRepositorio;
     }
 
     public List<ServicoLoja> ListarServicosLoja()
@@ -49,7 +50,7 @@ public class ServicoService : IServicoService
         if (string.IsNullOrWhiteSpace(servico.Nome))
             return false;
 
-        var loja = _servicoLojaRepositorio.BuscarPorId(servico.LojaId);
+        var loja = _lojaRepositorio.BuscarPorId(servico.LojaId);
 
         if (loja == null)
             throw new Exception("Loja não encontrada.");

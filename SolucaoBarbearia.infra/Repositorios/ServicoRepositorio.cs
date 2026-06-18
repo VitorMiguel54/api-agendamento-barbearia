@@ -34,8 +34,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                     comando.Parameters.AddWithValue("@tempo_minutos", servico.TempoMinutos);
                     comando.Parameters.AddWithValue("@preco", servico.Preco);
 
-                    int linhasAfetadas = comando.ExecuteNonQuery();
-                    return linhasAfetadas > 0;
+                    servico.Id = Convert.ToInt32(comando.ExecuteScalar());
+                    return servico.Id > 0;
                 }
             }
         }

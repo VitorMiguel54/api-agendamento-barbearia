@@ -12,7 +12,7 @@ namespace SolucaoBarbeariaTests.Services
         private readonly Mock<IClienteRepository> _clienteRepositoryMock;
         private readonly Mock<ILojaRepository> _lojaRepositoryMock;
         private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
-        private readonly Mock<IServicoRepository> _servicoRepositoryMock;
+        private readonly Mock<IServicoLojaRepository> _servicoLojaRepositoryMock;
         private readonly IAgendamentoService _service;
 
         public AgendamentoServiceTeste()
@@ -21,13 +21,13 @@ namespace SolucaoBarbeariaTests.Services
             _clienteRepositoryMock = new Mock<IClienteRepository>();
             _lojaRepositoryMock = new Mock<ILojaRepository>();
             _profissionalRepositoryMock = new Mock<IProfissionalRepository>();
-            _servicoRepositoryMock = new Mock<IServicoRepository>();
+            _servicoLojaRepositoryMock = new Mock<IServicoLojaRepository>();
 
             _service = new AgendamentoService(
                 _repositoryMock.Object,
                 _clienteRepositoryMock.Object,
                 _profissionalRepositoryMock.Object,
-                _servicoRepositoryMock.Object,
+                _servicoLojaRepositoryMock.Object,
                 _lojaRepositoryMock.Object);
         }
 
@@ -171,9 +171,9 @@ namespace SolucaoBarbeariaTests.Services
             _profissionalRepositoryMock
                 .Setup(r => r.BuscarPorId(agendamento.ProfissionalId))
                 .Returns(new Profissional { Id = agendamento.ProfissionalId, LojaId = 1 });
-            _servicoRepositoryMock
+            _servicoLojaRepositoryMock
                 .Setup(r => r.BuscarPorId(agendamento.ServicoLojaId))
-                .Returns((Servico)null);
+                .Returns((ServicoLoja)null);
 
             var excecao = Assert.Throws<Exception>(() => _service.Cadastrar(agendamento));
 
@@ -192,9 +192,9 @@ namespace SolucaoBarbeariaTests.Services
             _profissionalRepositoryMock
                 .Setup(r => r.BuscarPorId(agendamento.ProfissionalId))
                 .Returns(new Profissional { Id = agendamento.ProfissionalId, LojaId = 1 });
-            _servicoRepositoryMock
+            _servicoLojaRepositoryMock
                 .Setup(r => r.BuscarPorId(agendamento.ServicoLojaId))
-                .Returns(new Servico { Id = agendamento.ServicoLojaId, TempoMinutos = 30 });
+                .Returns(new ServicoLoja { Id = agendamento.ServicoLojaId, TempoMinutos = 30 });
             _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(1))
                 .Returns((Loja)null);
@@ -247,11 +247,12 @@ namespace SolucaoBarbeariaTests.Services
 
             ConfigurarDependenciasValidas();
             _repositoryMock
-                .Setup(r => r.Listar())
-                .Returns(new List<Agendamento> { agendamentoExistente });
-            _servicoRepositoryMock
-                .Setup(r => r.BuscarPorId(2))
-                .Returns(new Servico { Id = 2, TempoMinutos = 30 });
+                .Setup(r => r.ExisteConflito(
+                    agendamento.ProfissionalId,
+                    agendamento.DataAgendamento,
+                    agendamento.DataAgendamento.AddMinutes(30),
+                    null))
+                .Returns(true);
 
             var excecao = Assert.Throws<Exception>(() => _service.Cadastrar(agendamento));
 
@@ -275,8 +276,12 @@ namespace SolucaoBarbeariaTests.Services
 
             ConfigurarDependenciasValidas();
             _repositoryMock
-                .Setup(r => r.Listar())
-                .Returns(new List<Agendamento> { agendamentoExistente });
+                .Setup(r => r.ExisteConflito(
+                    agendamento.ProfissionalId,
+                    agendamento.DataAgendamento,
+                    agendamento.DataAgendamento.AddMinutes(30),
+                    null))
+                .Returns(false);
             _repositoryMock
                 .Setup(r => r.Cadastrar(agendamento))
                 .Returns(true);
@@ -291,6 +296,7 @@ namespace SolucaoBarbeariaTests.Services
         public void AtualizarAgendamento_DeveRepassarAgendamentoParaRepositorio()
         {
             var agendamento = CriarAgendamentoValido();
+            ConfigurarDependenciasValidas();
 
             _service.Atualizar(agendamento);
 
@@ -348,15 +354,15 @@ namespace SolucaoBarbeariaTests.Services
             _profissionalRepositoryMock
                 .Setup(r => r.BuscarPorId(1))
                 .Returns(new Profissional { Id = 1, LojaId = 1, Nome = "Profissional Teste" });
-            _servicoRepositoryMock
+            _servicoLojaRepositoryMock
                 .Setup(r => r.BuscarPorId(1))
-                .Returns(new Servico { Id = 1, LojaId = 1, Nome = "Corte", Descricao = "Corte simples", TempoMinutos = 30, Preco = 50 });
+                .Returns(new ServicoLoja { Id = 1, LojaId = 1, ServicoId = 1, TempoMinutos = 30, Preco = 50, Ativo = true });
             _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(1))
                 .Returns(new Loja { Id = 1, Nome = "Loja Teste", HoraAbertura = new TimeSpan(8, 0, 0), HoraFechamento = new TimeSpan(18, 0, 0) });
             _repositoryMock
-                .Setup(r => r.Listar())
-                .Returns(new List<Agendamento>());
+                .Setup(r => r.ExisteConflito(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int?>()))
+                .Returns(false);
         }
 
         private static Agendamento CriarAgendamentoValido()

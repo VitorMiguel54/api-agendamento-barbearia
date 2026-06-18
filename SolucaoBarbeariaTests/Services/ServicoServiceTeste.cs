@@ -10,13 +10,15 @@ namespace SolucaoBarbeariaTests.Services
     {
         private readonly Mock<IServicoRepository> _repositoryMock;
         private readonly Mock<IServicoLojaRepository> _servicoLojaRepositoryMock;
+        private readonly Mock<ILojaRepository> _lojaRepositoryMock;
         private readonly IServicoService _service;
 
         public ServicoServiceTeste()
         {
             _repositoryMock = new Mock<IServicoRepository>();
             _servicoLojaRepositoryMock = new Mock<IServicoLojaRepository>();
-            _service = new ServicoService(_repositoryMock.Object, _servicoLojaRepositoryMock.Object);
+            _lojaRepositoryMock = new Mock<ILojaRepository>();
+            _service = new ServicoService(_repositoryMock.Object, _servicoLojaRepositoryMock.Object, _lojaRepositoryMock.Object);
         }
 
 
@@ -63,9 +65,9 @@ namespace SolucaoBarbeariaTests.Services
         [Fact]
         public void CadastrarServico_RetornarServicoCadastrado()
         {
-            _servicoLojaRepositoryMock
+            _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(It.IsAny<int>()))
-                .Returns(new ServicoLoja());
+                .Returns(new Loja());
 
             _repositoryMock
                 .Setup(r => r.Cadastrar(It.IsAny<Servico>()))
@@ -83,9 +85,9 @@ namespace SolucaoBarbeariaTests.Services
         public void CadastrarServico_RetornarErroNomeVazio()
         {
 
-            _servicoLojaRepositoryMock
+            _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(It.IsAny<int>()))
-                .Returns((ServicoLoja)null);
+                .Returns((Loja)null);
 
             Assert.Throws<Exception>(() => _service.Cadastrar(new Servico() { Nome = "", Descricao = "Engraxar Sapatos", TempoMinutos = 45, Preco = 30 }));
 
@@ -97,9 +99,9 @@ namespace SolucaoBarbeariaTests.Services
         public void CadastrarServico_RetornarCadastroSemDescricao()
         {
 
-            _servicoLojaRepositoryMock
+            _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(It.IsAny<int>()))
-                .Returns((ServicoLoja)null);
+                .Returns((Loja)null);
 
             Assert.Throws<Exception>(() => _service.Cadastrar(new Servico() { Nome = "Engraxate", Descricao = "", TempoMinutos = 45, Preco = 30 }));
 
@@ -111,9 +113,9 @@ namespace SolucaoBarbeariaTests.Services
         public void CadastrarServico_RetornarErroTempoMinutosMenorQueZero()
         {
 
-            _servicoLojaRepositoryMock
+            _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(It.IsAny<int>()))
-                .Returns(new ServicoLoja());
+                .Returns(new Loja());
 
             Assert.Throws<Exception>(() => _service.Cadastrar(new Servico() { Nome = "Engraxate", Descricao = "Engraxar Sapatos", TempoMinutos = 0, Preco = 45 }));
 
@@ -125,9 +127,9 @@ namespace SolucaoBarbeariaTests.Services
         public void CadastrarServico_RetornarErroTempoMinutosMenorQueDez()
         {
                 
-            _servicoLojaRepositoryMock
+            _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(It.IsAny<int>()))
-                .Returns(new ServicoLoja());
+                .Returns(new Loja());
 
             Assert.Throws<Exception>(() => _service.Cadastrar(new Servico() { Nome = "Engraxate", Descricao = "Engraxar Sapatos", Preco = 30, TempoMinutos = 8 }));
 

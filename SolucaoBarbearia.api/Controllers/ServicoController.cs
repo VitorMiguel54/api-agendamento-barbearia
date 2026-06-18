@@ -1,15 +1,17 @@
-﻿using Dominio.Models;
+using Dominio.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SolucaoBarbearia.api.DTOs;
+using SolucaoBarbearia.servico.Interfaces;
 
 [ApiController]
-[Route("[controller]")]
-
+[Authorize]
+[Route("api/[controller]")]
 public class ServicoController : ControllerBase
 {
-    private readonly ServicoService _service;
+    private readonly IServicoService _service;
 
-    public ServicoController(ServicoService service)
+    public ServicoController(IServicoService service)
     {
         _service = service;
     }
@@ -50,13 +52,13 @@ public class ServicoController : ControllerBase
         {
             LojaId = dto.LojaId,
             Nome = dto.Nome,
-            Descricao= dto.Descricao,
-            TempoMinutos= dto.TempoMinutos,
+            Descricao = dto.Descricao,
+            TempoMinutos = dto.TempoMinutos,
             Preco = dto.Preco
         };
 
         _service.Cadastrar(servico);
-        return Ok("Serviço cadastrado com sucesso");
+        return CreatedAtAction(nameof(GetById), new { id = servico.Id }, "Serviço cadastrado com sucesso");
     }
 
     [HttpPut("{id}")]
@@ -79,7 +81,7 @@ public class ServicoController : ControllerBase
 
         _service.Atualizar(servicoAtualizado);
 
-        return Ok("Atualizado com sucesso!");
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -92,6 +94,6 @@ public class ServicoController : ControllerBase
 
         _service.Remover(id);
 
-        return Ok("Excluído com sucesso!");
+        return NoContent();
     }
 }
