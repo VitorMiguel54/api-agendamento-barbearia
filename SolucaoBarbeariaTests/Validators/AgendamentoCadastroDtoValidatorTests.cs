@@ -11,23 +11,23 @@ namespace SolucaoBarbeariaTests.Validators;
 public class AgendamentoCadastroDtoValidatorTests
 {
     private readonly Mock<IClienteRepository> _clienteRepositoryMock;
-    private readonly Mock<IServicoRepository> _servicoRepositoryMock;
+    private readonly Mock<IServicoLojaRepository> _servicoLojaRepositoryMock;
     private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
     private readonly AgendamentoCadastroDtoValidator _validator;
 
     public AgendamentoCadastroDtoValidatorTests()
     {
         _clienteRepositoryMock = new Mock<IClienteRepository>();
-        _servicoRepositoryMock = new Mock<IServicoRepository>();
+        _servicoLojaRepositoryMock = new Mock<IServicoLojaRepository>();
         _profissionalRepositoryMock = new Mock<IProfissionalRepository>();
 
         _clienteRepositoryMock
             .Setup(x => x.BuscarPorId(It.IsAny<int>()))
             .Returns(new Cliente());
 
-        _servicoRepositoryMock
+        _servicoLojaRepositoryMock
             .Setup(x => x.BuscarPorId(It.IsAny<int>()))
-            .Returns(new Servico());
+            .Returns(new ServicoLoja());
 
         _profissionalRepositoryMock
             .Setup(x => x.BuscarPorId(It.IsAny<int>()))
@@ -35,7 +35,7 @@ public class AgendamentoCadastroDtoValidatorTests
 
         _validator = new AgendamentoCadastroDtoValidator(
             _clienteRepositoryMock.Object,
-            _servicoRepositoryMock.Object,
+            _servicoLojaRepositoryMock.Object,
             _profissionalRepositoryMock.Object);
     }
 
@@ -89,9 +89,9 @@ public class AgendamentoCadastroDtoValidatorTests
     [Fact]
     public void ServicoLojaId_Inexistente_DeveGerarErro()
     {
-        _servicoRepositoryMock
+        _servicoLojaRepositoryMock
             .Setup(x => x.BuscarPorId(It.IsAny<int>()))
-            .Returns((Servico)null!);
+            .Returns((ServicoLoja)null!);
 
         var dto = CriarDtoValido(servicoLojaId: 9999);
 

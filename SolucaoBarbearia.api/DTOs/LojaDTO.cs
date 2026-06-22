@@ -3,7 +3,7 @@
     public class LojaDTO
     {
         public int Id { get; set; }
-        public string Nome { get; set; }
+        public string Nome { get; set; } = string.Empty;
         public TimeSpan HoraAbertura { get; set; }
         public TimeSpan HoraFechamento { get; set; }
     }

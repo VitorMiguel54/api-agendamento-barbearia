@@ -11,7 +11,8 @@ namespace SolucaoBarbearia.infra.Repositorios
 
         public ProfissionalRepositorio(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' nao configurada.");
         }
 
         public bool Cadastrar(Profissional profissional)
@@ -56,7 +57,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                         {
                             Id = Convert.ToInt32(leitor["id"]),
                             LojaId = Convert.ToInt32(leitor["loja_id"]),
-                            Nome = leitor["nome"].ToString(),
+                            Nome = leitor["nome"].ToString() ?? string.Empty,
                             DataCriacao = Convert.ToDateTime(leitor["data_criacao"]),
                             DataAtualizacao = leitor["data_atualizacao"] == DBNull.Value ? null
                         :   Convert.ToDateTime(leitor["data_atualizacao"]),
@@ -109,7 +110,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                 }
             }
 
-            return null;
+            return null!;
         }
 
         public void Atualizar(Profissional profissional)

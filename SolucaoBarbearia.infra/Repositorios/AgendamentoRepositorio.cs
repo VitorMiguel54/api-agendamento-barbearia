@@ -16,7 +16,8 @@ namespace SolucaoBarbearia.infra.Repositorios
 
         public AgendamentoRepositorio(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' nao configurada.");
         }
 
         public bool Cadastrar(Agendamento agendamento)
@@ -155,7 +156,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                 }
             }
 
-            return null;
+            return null!;
         }
 
         public bool ExisteConflito(int profissionalId, DateTime inicio, DateTime fim, int? agendamentoIgnoradoId = null)

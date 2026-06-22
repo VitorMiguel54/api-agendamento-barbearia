@@ -11,7 +11,8 @@ namespace SolucaoBarbearia.infra.Repositorios
 
         public ServicoRepositorio(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' nao configurada.");
         }
 
         public bool Cadastrar(Servico servico)
@@ -59,8 +60,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                         {
                             Id = Convert.ToInt32(leitor["id"]),
                             LojaId = Convert.ToInt32(leitor["loja_id"]),
-                            Nome = leitor["nome"].ToString(),
-                            Descricao = leitor["descricao"].ToString(),
+                            Nome = leitor["nome"].ToString() ?? string.Empty,
+                            Descricao = leitor["descricao"].ToString() ?? string.Empty,
                             TempoMinutos = Convert.ToInt32(leitor["tempo_minutos"]),
                             Preco = Convert.ToDecimal(leitor["preco"]),
                             DataCriacao = Convert.ToDateTime(leitor["data_criacao"]),
@@ -106,8 +107,8 @@ namespace SolucaoBarbearia.infra.Repositorios
                                 ServicoLojaId = Convert.ToInt32(reader["ServicoLojaId"]),
                                 LojaID = Convert.ToInt32(reader["LojaId"]),
                                 ServicoId = Convert.ToInt32(reader["ServicoId"]),
-                                Nome = reader["nome"].ToString(),
-                                Descricao = reader["descricao"].ToString(),
+                                Nome = reader["nome"].ToString() ?? string.Empty,
+                                Descricao = reader["descricao"].ToString() ?? string.Empty,
                                 Preco = Convert.ToDecimal(reader["preco"]),
                                 TempoMinutos = Convert.ToInt32(reader["tempo_minutos"])
                             });
@@ -164,7 +165,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                 }
             }
 
-            return null;
+            return null!;
         }
 
         public void Atualizar(Servico servico)

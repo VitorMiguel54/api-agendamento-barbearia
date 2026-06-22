@@ -11,7 +11,8 @@ namespace SolucaoBarbearia.infra.Repositorios
 
         public LojaRepositorio(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' nao configurada.");
         }
 
         public bool Cadastrar(Loja loja)
@@ -56,7 +57,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                         listarLojas.Add(new Loja()
                         {
                             Id = Convert.ToInt32(leitor["id"]),
-                            Nome = leitor["nome"].ToString(),
+                            Nome = leitor["nome"].ToString() ?? string.Empty,
                             HoraAbertura = (TimeSpan)leitor["hora_abertura"],
                             HoraFechamento = (TimeSpan)leitor["hora_fechamento"],
                             DataCriacao = Convert.ToDateTime(leitor["data_criacao"]),
@@ -111,7 +112,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                 }
             }
 
-            return null;
+            return null!;
         }
 
         public void Atualizar(Loja loja)

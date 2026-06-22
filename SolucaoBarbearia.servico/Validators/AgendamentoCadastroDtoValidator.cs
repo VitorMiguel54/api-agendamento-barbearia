@@ -7,16 +7,16 @@ namespace Barbearia.Service.Validators;
 public class AgendamentoCadastroDtoValidator : AbstractValidator<AgendamentoCadastroDto>
 {
     private readonly IClienteRepository _clienteRepository;
-    private readonly IServicoRepository _servicoRepository;
+    private readonly IServicoLojaRepository _servicoLojaRepository;
     private readonly IProfissionalRepository _profissionalRepository;
 
     public AgendamentoCadastroDtoValidator(
         IClienteRepository clienteRepository,
-        IServicoRepository servicoRepository,
+        IServicoLojaRepository servicoLojaRepository,
         IProfissionalRepository profissionalRepository)
     {
         _clienteRepository = clienteRepository;
-        _servicoRepository = servicoRepository;
+        _servicoLojaRepository = servicoLojaRepository;
         _profissionalRepository = profissionalRepository;
 
         RuleFor(x => x.ClienteId)
@@ -53,7 +53,7 @@ public class AgendamentoCadastroDtoValidator : AbstractValidator<AgendamentoCada
 
     private bool ExisteServico(int servicoId)
     {
-        return _servicoRepository.BuscarPorId(servicoId) is not null;
+        return _servicoLojaRepository.BuscarPorId(servicoId) is not null;
     }
 
     private bool ExisteProfissional(int profissionalId)

@@ -30,7 +30,11 @@ builder.Services.AddValidatorsFromAssemblyContaining<ClienteCadastroDtoValidator
 
 builder.Services.AddControllers();
 builder.Services
-    .AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = ApiKeyAuthenticationHandler.SchemeName;
+        options.DefaultChallengeScheme = ApiKeyAuthenticationHandler.SchemeName;
+    })
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
         ApiKeyAuthenticationHandler.SchemeName,
         options => { });

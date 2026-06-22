@@ -8,6 +8,6 @@ namespace SolucaoBarbearia.api.DTOs
         public int LojaId { get; set; }
 
         [Required(ErrorMessage = "Nome obrigatório!")]
-        public string Nome { get; set; }
+        public string Nome { get; set; } = string.Empty;
     }
 }

@@ -5,7 +5,7 @@ namespace SolucaoBarbearia.api.DTOs
     public class CriarLojaDTO
     {
         [Required(ErrorMessage = "Nome obrigatório!")]
-        public string Nome { get; set; }
+        public string Nome { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Horário de abertura obrigatório!")]
         public TimeSpan HoraAbertura { get; set; }

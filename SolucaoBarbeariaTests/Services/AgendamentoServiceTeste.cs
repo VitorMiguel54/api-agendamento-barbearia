@@ -134,7 +134,7 @@ namespace SolucaoBarbeariaTests.Services
 
             _clienteRepositoryMock
                 .Setup(r => r.BuscarPorId(agendamento.ClienteId))
-                .Returns((Cliente)null);
+                .Returns(default(Cliente)!);
 
             var excecao = Assert.Throws<Exception>(() => _service.Cadastrar(agendamento));
 
@@ -152,7 +152,7 @@ namespace SolucaoBarbeariaTests.Services
                 .Returns(new Cliente { Id = agendamento.ClienteId });
             _profissionalRepositoryMock
                 .Setup(r => r.BuscarPorId(agendamento.ProfissionalId))
-                .Returns((Profissional)null);
+                .Returns(default(Profissional)!);
 
             var excecao = Assert.Throws<Exception>(() => _service.Cadastrar(agendamento));
 
@@ -173,7 +173,7 @@ namespace SolucaoBarbeariaTests.Services
                 .Returns(new Profissional { Id = agendamento.ProfissionalId, LojaId = 1 });
             _servicoLojaRepositoryMock
                 .Setup(r => r.BuscarPorId(agendamento.ServicoLojaId))
-                .Returns((ServicoLoja)null);
+                .Returns(default(ServicoLoja)!);
 
             var excecao = Assert.Throws<Exception>(() => _service.Cadastrar(agendamento));
 
@@ -197,7 +197,7 @@ namespace SolucaoBarbeariaTests.Services
                 .Returns(new ServicoLoja { Id = agendamento.ServicoLojaId, TempoMinutos = 30 });
             _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(1))
-                .Returns((Loja)null);
+                .Returns(default(Loja)!);
 
             var excecao = Assert.Throws<Exception>(() => _service.Cadastrar(agendamento));
 
@@ -304,6 +304,82 @@ namespace SolucaoBarbeariaTests.Services
         }
 
         [Fact]
+        public void AtualizarAgendamento_NaoPermiteClienteInexistente()
+        {
+            var agendamento = CriarAgendamentoValido();
+
+            _clienteRepositoryMock
+                .Setup(r => r.BuscarPorId(agendamento.ClienteId))
+                .Returns(default(Cliente)!);
+
+            var excecao = Assert.Throws<Exception>(() => _service.Atualizar(agendamento));
+
+            Assert.Equal("Cliente não encontrado.", excecao.Message);
+            _repositoryMock.Verify(r => r.Atualizar(It.IsAny<Agendamento>()), Times.Never);
+        }
+
+        [Fact]
+        public void AtualizarAgendamento_NaoPermiteServicoLojaInexistente()
+        {
+            var agendamento = CriarAgendamentoValido();
+
+            _clienteRepositoryMock
+                .Setup(r => r.BuscarPorId(agendamento.ClienteId))
+                .Returns(new Cliente { Id = agendamento.ClienteId });
+            _profissionalRepositoryMock
+                .Setup(r => r.BuscarPorId(agendamento.ProfissionalId))
+                .Returns(new Profissional { Id = agendamento.ProfissionalId, LojaId = 1 });
+            _servicoLojaRepositoryMock
+                .Setup(r => r.BuscarPorId(agendamento.ServicoLojaId))
+                .Returns(default(ServicoLoja)!);
+
+            var excecao = Assert.Throws<Exception>(() => _service.Atualizar(agendamento));
+
+            Assert.Equal("Serviço não encontrado.", excecao.Message);
+            _repositoryMock.Verify(r => r.Atualizar(It.IsAny<Agendamento>()), Times.Never);
+        }
+
+        [Fact]
+        public void AtualizarAgendamento_NaoPermiteConflitoDeHorarioIgnorandoProprioId()
+        {
+            var agendamento = CriarAgendamentoValido();
+            ConfigurarDependenciasValidas();
+            _repositoryMock
+                .Setup(r => r.ExisteConflito(
+                    agendamento.ProfissionalId,
+                    agendamento.DataAgendamento,
+                    agendamento.DataAgendamento.AddMinutes(30),
+                    agendamento.Id))
+                .Returns(true);
+
+            var excecao = Assert.Throws<Exception>(() => _service.Atualizar(agendamento));
+
+            Assert.Equal("Horário indisponível.", excecao.Message);
+            _repositoryMock.Verify(r => r.ExisteConflito(
+                agendamento.ProfissionalId,
+                agendamento.DataAgendamento,
+                agendamento.DataAgendamento.AddMinutes(30),
+                agendamento.Id), Times.Once);
+            _repositoryMock.Verify(r => r.Atualizar(It.IsAny<Agendamento>()), Times.Never);
+        }
+
+        [Fact]
+        public void AtualizarAgendamento_IgnoraProprioAgendamentoNaValidacaoDeConflito()
+        {
+            var agendamento = CriarAgendamentoValido();
+            ConfigurarDependenciasValidas();
+
+            _service.Atualizar(agendamento);
+
+            _repositoryMock.Verify(r => r.ExisteConflito(
+                agendamento.ProfissionalId,
+                agendamento.DataAgendamento,
+                agendamento.DataAgendamento.AddMinutes(30),
+                agendamento.Id), Times.Once);
+            _repositoryMock.Verify(r => r.Atualizar(agendamento), Times.Once);
+        }
+
+        [Fact]
         public void RemoverAgendamento_DeveRemoverAgendamentoFuturo()
         {
             var agendamento = CriarAgendamentoValido();
@@ -322,7 +398,7 @@ namespace SolucaoBarbeariaTests.Services
         {
             _repositoryMock
                 .Setup(r => r.BuscarPorId(1))
-                .Returns((Agendamento)null);
+                .Returns(default(Agendamento)!);
 
             var excecao = Assert.Throws<Exception>(() => _service.Remover(1));
 

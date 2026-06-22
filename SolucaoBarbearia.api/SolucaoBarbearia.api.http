@@ -1,6 +1,8 @@
 @SolucaoBarbearia.api_HostAddress = http://localhost:5266
+@ApiKey = dev-api-key
 
-GET {{SolucaoBarbearia.api_HostAddress}}/weatherforecast/
+GET {{SolucaoBarbearia.api_HostAddress}}/api/cliente
 Accept: application/json
+X-Api-Key: {{ApiKey}}
 
 ###

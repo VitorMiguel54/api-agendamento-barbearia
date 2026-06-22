@@ -52,7 +52,7 @@ namespace SolucaoBarbeariaTests.Services
             var resultado = _service.Listar();
 
             Assert.NotNull(resultado);
-            Assert.Equal(0, resultado.Count);
+            Assert.Empty(resultado);
 
             _repositoryMock.Verify(r => r.Listar(), Times.Once);
         }
@@ -247,7 +247,7 @@ namespace SolucaoBarbeariaTests.Services
         {
             _repositoryMock
                 .Setup(r => r.BuscarPorId(1))
-                .Returns((Cliente)null);
+                .Returns(default(Cliente)!);
 
             Assert.Throws<Exception>(() => _service.Remover(1));
 

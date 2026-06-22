@@ -27,17 +27,17 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationS
 
         if (string.IsNullOrWhiteSpace(configuredApiKey))
         {
-            return Task.FromResult(AuthenticateResult.Fail("API key não configurada."));
+            return Task.FromResult(AuthenticateResult.Fail("API key nao configurada."));
         }
 
         if (!Request.Headers.TryGetValue(HeaderName, out var providedApiKey))
         {
-            return Task.FromResult(AuthenticateResult.Fail("API key não informada."));
+            return Task.FromResult(AuthenticateResult.Fail("API key nao informada."));
         }
 
-        if (!string.Equals(providedApiKey, configuredApiKey, StringComparison.Ordinal))
+        if (!string.Equals(providedApiKey.ToString(), configuredApiKey, StringComparison.Ordinal))
         {
-            return Task.FromResult(AuthenticateResult.Fail("API key inválida."));
+            return Task.FromResult(AuthenticateResult.Fail("API key invalida."));
         }
 
         var claims = new[]

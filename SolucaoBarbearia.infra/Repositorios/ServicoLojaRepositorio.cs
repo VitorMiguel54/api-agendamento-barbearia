@@ -11,7 +11,8 @@ namespace SolucaoBarbearia.infra.Repositorios
 
         public ServicoLojaRepositorio(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' nao configurada.");
         }
 
         public bool Cadastrar(ServicoLoja servicoLoja)
@@ -103,7 +104,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                 }
             }
 
-            return null;
+            return null!;
         }
 
         public void Atualizar(ServicoLoja servicoLoja)

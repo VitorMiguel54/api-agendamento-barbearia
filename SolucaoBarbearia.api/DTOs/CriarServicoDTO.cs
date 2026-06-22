@@ -8,9 +8,9 @@ namespace SolucaoBarbearia.api.DTOs
         public int LojaId { get; set; }
 
         [Required(ErrorMessage = "Nome obrigatório!")]
-        public string Nome { get; set; }
+        public string Nome { get; set; } = string.Empty;
 
-        public string Descricao { get; set; }
+        public string Descricao { get; set; } = string.Empty;
 
         [Range(1, int.MaxValue, ErrorMessage = "Tempo deve ser maior que 0")]
         public int TempoMinutos { get; set; }

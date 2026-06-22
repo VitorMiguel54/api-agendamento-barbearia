@@ -17,7 +17,8 @@ namespace SolucaoBarbearia.infra.Repositorios
 
         public ClienteRepositorio(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' nao configurada.");
         }
 
         public bool Cadastrar(Cliente cliente)
@@ -85,9 +86,9 @@ namespace SolucaoBarbearia.infra.Repositorios
                         listaClientes.Add(new Cliente()
                         {
                             Id = Convert.ToInt32(leitor["id"]),
-                            Nome = leitor["nome"].ToString(),
-                            Telefone = leitor["telefone"].ToString(),
-                            Email = leitor["email"].ToString(),
+                            Nome = leitor["nome"].ToString() ?? string.Empty,
+                            Telefone = leitor["telefone"].ToString() ?? string.Empty,
+                            Email = leitor["email"].ToString() ?? string.Empty,
                             DataCriacao = Convert.ToDateTime(leitor["data_criacao"]),
                             DataAtualizacao = leitor["data_atualizacao"] == DBNull.Value ? null : Convert.ToDateTime(leitor["data_atualizacao"]),
                             Ativo = Convert.ToBoolean(leitor["ativo"])
@@ -140,7 +141,7 @@ namespace SolucaoBarbearia.infra.Repositorios
                 }
             }
 
-            return null;
+            return null!;
         }
 
         public void Atualizar(Cliente cliente)

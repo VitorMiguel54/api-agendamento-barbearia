@@ -56,7 +56,7 @@ namespace SolucaoBarbeariaTests.Services
             var resultado = _service.Listar();
 
             Assert.NotNull(resultado);
-            Assert.Equal(0, resultado.Count);
+            Assert.Empty(resultado);
 
             _repositoryMock.Verify(r => r.Listar(), Times.Once);
         }
@@ -87,7 +87,7 @@ namespace SolucaoBarbeariaTests.Services
 
             _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(It.IsAny<int>()))
-                .Returns((Loja)null);
+                .Returns(default(Loja)!);
 
             Assert.Throws<Exception>(() => _service.Cadastrar(new Servico() { Nome = "", Descricao = "Engraxar Sapatos", TempoMinutos = 45, Preco = 30 }));
 
@@ -101,7 +101,7 @@ namespace SolucaoBarbeariaTests.Services
 
             _lojaRepositoryMock
                 .Setup(r => r.BuscarPorId(It.IsAny<int>()))
-                .Returns((Loja)null);
+                .Returns(default(Loja)!);
 
             Assert.Throws<Exception>(() => _service.Cadastrar(new Servico() { Nome = "Engraxate", Descricao = "", TempoMinutos = 45, Preco = 30 }));
 
@@ -319,7 +319,7 @@ namespace SolucaoBarbeariaTests.Services
         {
             _repositoryMock
                 .Setup(r => r.BuscarPorId(1))
-                .Returns((Servico)null);
+                .Returns(default(Servico)!);
 
             Assert.Throws<Exception>(() => _service.Remover(1));
 
